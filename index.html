@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<!--
+	Strongly Typed by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Parallelization of Computational Fluid Dynamic Simulation of Data Center Air-Conditioning System</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+	</head>
+	<body class="no-sidebar">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<div id="header-wrapper">
+					<div id="header" class="container">
+
+						<!-- Logo -->
+							<h1 id="logo"><a href="index.html">Project Proposal</a></h1>
+							<p>Jin Hu(jinh), Siliang Lu(siliang1)</p>
+
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li><a class="icon fa-home" href="index.html"><span>Proposal</span></a></li>
+									<!-- <li>
+										<a href="#" class="icon fa-bar-chart-o"><span>Dropdown</span></a>
+										<ul>
+											<li><a href="#">Lorem ipsum dolor</a></li>
+											<li><a href="#">Magna phasellus</a></li>
+											<li><a href="#">Etiam dolore nisl</a></li>
+											<li>
+												<a href="#">Phasellus consequat</a>
+												<ul>
+													<li><a href="#">Magna phasellus</a></li>
+													<li><a href="#">Etiam dolore nisl</a></li>
+													<li><a href="#">Phasellus consequat</a></li>
+												</ul>
+											</li>
+											<li><a href="#">Veroeros feugiat</a></li>
+										</ul>
+									</li> -->
+									<li><a class="icon fa-cog" href="#"><span>Checkpoint</span></a></li>
+									<li><a class="icon fa-retweet" href="#"><span>Summary</span></a></li>
+								</ul>
+							</nav>
+
+					</div>
+				</div>
+
+			<!-- Main -->
+				<div id="main-wrapper">
+					<div id="main" class="container">
+						<div id="content">
+
+							<!-- Post -->
+								<article class="box post">
+									<header>
+										<!-- <h2>Behold! This is the <strong>no sidebar</strong> layout<br />
+										with no sidebar at all!</h2> -->
+										<h2>Parallelization of CFD of Data Center Air-Conditioning System</h2>
+									</header>
+									<span class="image featured"><img src="images/cover.jpg" alt="" /></span>
+									<h3>Summary</h3>
+									<p>We are going to implement a 2D CFD solver to simulate airflow patterns of a Data Center Air-Conditioning System with MPI model. </p>
+									
+									<h3>Background</h3>
+									<p>With the rapid development of computer science, more and more data center has been established. Data center is used to accommodate computer systems, including telecommunications and storage systems. It usually includes redundant or backup power supplies, redundant data communications connections, air conditioning, fire suppression and security devices [1]. Due to high power density of each rack as well as large quantity of servers installed in the data center, it requires cooling all year round. As a result, data center consumes considerable amount of energy for cooling. Therefore, high performance computing data center design is needed for reducing energy consumption and save costs.</p>
+									<p>Many effective computer room air conditioning (CRAC) systems are designed for optimizing the cooling performance as well as the amount of energy savings. Figure 1-1 shows a typical CRAC system where the cold air flows through the raised floor and is supplied from the floor into the server.</p>
+									<p>In order to detect the potential problem due to bad air flow design, computational fluid dynamic (CFD) simulation is necessary. Our 2D Navier-Stokes solver is aimed to predict the interior air flow patterns and temperature distribution with different inlet velocity and compare the results with Ansys. The simulation results can be used to help CRAC system designers to identify better CRAC configurations. </p>
+									
+									<h3>Simulation Algorithm</h3>
+									<p>The simulation begins with geometry, boundary type and simulation control parameter input. To avoid serious oscillations of pressure value, a staggered grid mesh is then generated [12]. The main time-stepping simulation loop starts after initialization. An adaptive time step is calculated for stability purpose. Boundary values of the matrices of x-velocity (U), y-velocity (V) is updated at each time step n. Then the values of temperature (T) at each cell in fluid domain at (n+1) time step is solved. With that, a linear system of pressure values (P) is solved with Poisson solver with successive over-relaxation (SOR). With pressure values (P) at (n+1) time step, x-velocity (U) and y-velocity at (n+1) time step can be solved. Simulation time and step are updated after each main iteration. The whole simulation terminates when simulation time is greater or equals to desired end time. The algorithm is shown in the flowchart (Figure 3-1).</p>
+									<p>Since the problem is to solve the u (horizontal velocity), v (vertical velocity) and pressure of each cell within the domain of each time step, it will consume a huge amount of time if the mesh is fine enough so as to get convincing results. Parallelization of CFD problem could bring about significantly great speed up and still make sure the results are accetaple. An approach to parallelizing numerical algorithms for solving partial differential equations is to divide the underlying domain  into subdomains,  …and have each process treat one subdomain[]. By using MPI model to communicate, adjacent subdomains are able to exchange the necessary data. </p>
+
+									<h3>The Challenges</h3>
+									<p></p>
+
+									<h3>The resources/Platform Choice</h3>
+									<p>We will use MPI on Xeon Phi under Latedays cluster. The starter code is the serial version of 2D solver of Data Center Air-conditioning system written by us with C. The serial programs follow the pseudocode from the book called Numerical Simulation. (Are there any other resources you need, but haven't figured out how to obtain yet? Could you benefit from access to any special machines?</p>
+
+									<h3>Goals and Deliverables</h3>
+									<p>
+										Separate your goals into what you PLAN TO ACHIEVE (what you believe you must get done to have a successful project and get the grade you expect) and an extra goal or two that you HOPE TO ACHIEVE if the project goes really well and you get ahead of schedule, as well as goals in case the work goes more slowly. It may not be possible to state precise performance goals at this time, but we encourage you be as precise as possible. If you do state a goal, give some justification of why you think you can achieve it. (e.g., I hope to speed up my starter code 10x, because if I did it would run in real-time.)
+									</p>
+									<p>
+											•	Main goal: Our main goal is to successfully complete the parallel version of our problem by speeding up the starter code ??. Justification:<br>
+
+											•	Extra goals: Since the current geometry is 2D grid with quadrilateral mesh, we could try to make our model more complex by creating 3D meshing. 
+									</p>
+									<p>
+										If applicable, describe the demo you plan to show at the poster session (will it be an interactive demo? will you show an output of the program that is really neat? will you show speedup graphs?). Specifically, what will you show us that will demonstrate you did a good job?
+										If your project is an analysis project, what are you hoping to learn about the workload or system being studied? What question(s) do you plan to answer in your analysis?
+									</p>
+									<p>
+										The project is aimed to study the airflow patterns and temperature distribution inside the data center with different supply velocity and direction so as to get a desirable Computer Room Air Conditioning System (CRAC) pre-design. We are going to benchmark performances of CRAC system with different initial inputs under different time steps before steady state. Moreover, we are going to compare our serial results, parallel results and results from commercial CFD software called ANSYS (do we need paper???) with the same inputs so as to evaluate the accuracy of our parallel programs. To be continued. 
+									</p>
+									<h3>Schedule</h3>
+									<p></p>
+								</article>
+
+						</div>
+					</div>
+				</div>
+
+			<!-- Footer -->
+				<!-- <div id="footer-wrapper">
+					<div id="footer" class="container">
+						<header>
+							<h2>Questions or comments? <strong>Get in touch:</strong></h2>
+						</header>
+						<div class="row">
+							<div class="6u 12u(mobile)">
+								<section>
+									<form method="post" action="#">
+										<div class="row 50%">
+											<div class="6u 12u(mobile)">
+												<input name="name" placeholder="Name" type="text" />
+											</div>
+											<div class="6u 12u(mobile)">
+												<input name="email" placeholder="Email" type="text" />
+											</div>
+										</div>
+										<div class="row 50%">
+											<div class="12u">
+												<textarea name="message" placeholder="Message"></textarea>
+											</div>
+										</div>
+										<div class="row 50%">
+											<div class="12u">
+												<a href="#" class="form-button-submit button icon fa-envelope">Send Message</a>
+											</div>
+										</div>
+									</form>
+								</section>
+							</div>
+							<div class="6u 12u(mobile)">
+								<section>
+									<p>Erat lorem ipsum veroeros consequat magna tempus lorem ipsum consequat Phaselamet
+									mollis tortor congue. Sed quis mauris sit amet magna accumsan tristique. Curabitur
+									leo nibh, rutrum eu malesuada.</p>
+									<div class="row">
+										<div class="6u 12u(mobile)">
+											<ul class="icons">
+												<li class="icon fa-home">
+													1234 Somewhere Road<br />
+													Nashville, TN 00000<br />
+													USA
+												</li>
+												<li class="icon fa-phone">
+													(000) 000-0000
+												</li>
+												<li class="icon fa-envelope">
+													<a href="#">info@untitled.tld</a>
+												</li>
+											</ul>
+										</div>
+										<div class="6u 12u(mobile)">
+											<ul class="icons">
+												<li class="icon fa-twitter">
+													<a href="#">@untitled-tld</a>
+												</li>
+												<li class="icon fa-instagram">
+													<a href="#">instagram.com/untitled-tld</a>
+												</li>
+												<li class="icon fa-dribbble">
+													<a href="#">dribbble.com/untitled-tld</a>
+												</li>
+												<li class="icon fa-facebook">
+													<a href="#">facebook.com/untitled-tld</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</section>
+							</div>
+						</div>
+					</div>
+					<div id="copyright" class="container">
+						<ul class="links">
+							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</div> -->
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.dropotron.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/skel-viewport.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
