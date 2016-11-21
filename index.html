@@ -65,7 +65,7 @@
 										with no sidebar at all!</h2> -->
 										<h2 align="center">Parallelization of CFD on DCAC System</h2>
 									</header>
-									<span class="image featured"><img src="images/cover.jpg" alt="" /></span>
+									<span class="image featured"><img src="images/newcover.jpg" alt="" /></span>
 									<h3>Summary</h3>
 									<p>
 										We are going to implement a 2D CFD solver to simulate airflow patterns of a Data Center Air-Conditioning System with MPI model. 
@@ -146,6 +146,16 @@
 										11/28-12/4: Continue to improve the speedup and achieve the best speedup as we can.<br>
 										11/5-12/11: Run multiple benchmarks and compare with serial and commercial software performance. Complete demo, poster and report.<br>
 									</p>
+
+									<h3> Milestone Status(By 11/21)</h3>
+									<p>We have completed the serial version of the CFD simulation and investigated in two possible ways to parallel the implementation, one is using cuda and another is with MPI model. </p>
+									<p>We tested the correctness of our implementation and compared with matlab implementation. </p>
+									<p>We are behind our schedule by about one week and we think it is still possible to complete the main goal of our project, which is to achieve a non-trivial speedup for the CFD simulation. But in terms of achieving a parallel speedup that can complete a demo time simulation and rendering, we are concerned that the problem scale might be too large or our speedup will not be good enough. So we may only be able to run multiple simulations before the demo and show speedup graphs of the approaches we implemented and some analysis as well as some animations.</p>
+									<p>Revised Deliverables: </p>
+									<p>speedup graph of two or possibly more parallel approaches</p>
+									<p>analysis of the parallel approaches with speedup benefits and bottlenecks</p>
+									<p>comparison of speedup with commercial software</p>
+									<p>simulation results rendering animations</p>
 								</article>
 
 						</div>
