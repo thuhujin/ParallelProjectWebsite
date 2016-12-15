@@ -20,36 +20,16 @@
 				<div id="header-wrapper">
 					<div id="header" class="container">
 
-						<!-- Logo -->
-							<h1 id="logo"><a href="index.html">Project Proposal</a></h1>
+							<h1 id="logo"><a href="index.html">Project Report</a></h1>
 							<p>Jin Hu(jinh), Siliang Lu(siliang1)</p>
 
-						<!-- Nav -->
 							<nav id="nav">
 								<ul>
-									<li><a class="icon fa-home" href="index.html"><span>Proposal</span></a></li>
-									<!-- <li>
-										<a href="#" class="icon fa-bar-chart-o"><span>Dropdown</span></a>
-										<ul>
-											<li><a href="#">Lorem ipsum dolor</a></li>
-											<li><a href="#">Magna phasellus</a></li>
-											<li><a href="#">Etiam dolore nisl</a></li>
-											<li>
-												<a href="#">Phasellus consequat</a>
-												<ul>
-													<li><a href="#">Magna phasellus</a></li>
-													<li><a href="#">Etiam dolore nisl</a></li>
-													<li><a href="#">Phasellus consequat</a></li>
-												</ul>
-											</li>
-											<li><a href="#">Veroeros feugiat</a></li>
-										</ul>
-									</li> -->
-									<li><a class="icon fa-cog" href="#"><span>Checkpoint</span></a></li>
-									<li><a class="icon fa-retweet" href="#"><span>Summary</span></a></li>
+									<li><a class="icon fa-home" href="index.html"><span>Home</span></a></li>
+									<li><a class="icon fa-cog" href="chkp.html"><span>Checkpoint</span></a></li>
+									<li><a class="icon fa-cog" href="report.pdf"><span>Report Link</span></a></li>
 								</ul>
 							</nav>
-
 					</div>
 				</div>
 
@@ -63,184 +43,76 @@
 									<header>
 										<!-- <h2>Behold! This is the <strong>no sidebar</strong> layout<br />
 										with no sidebar at all!</h2> -->
-										<h2 align="center">Parallelization of CFD on DCAC System</h2>
+										<h1 align="center">Parallelization of CFD on DCAC System</h1>
 									</header>
-									<span class="image featured"><img src="images/newcover.jpg" alt="" /></span>
-									<h3>Summary</h3>
+									<span class="image featured"><img src="images/cover.jpg" alt="" /></span>
+									<h2 align="center">Introduction</h2>
 									<p>
-										We are going to implement a 2D CFD solver to simulate airflow patterns of a Data Center Air-Conditioning System with MPI model. 
+										We implemented a 2D CFD solver to simulate airflow patterns of a Data Center Air-Conditioning System with MPI model and Cuda. 
+									</p>
+									<h3>Data Center Cooling</h3>
+									<p>
+										Data center is a specially designed space, which houses numerous servers with high power intensity. Therefore, data center requires cooling all year round. However, without proper airflow design of the air-conditioning system, it will take risks of failure due to high temperature zone. Therefore, CFD simulation is necessary for engineers to detect the potential problem due to bad air flow design.
+										
+										In order to detect the potential problem due to bad air flow design, com- putational fluid dynamic (CFD) simulation is necessary. Our 2D Navier-Stokes solver is aimed to predict the interior air flow patterns and temperature distri- bution with different inlet velocities and validate the results with Ansys. The simulation results can be used to help computer room air conditioning(CRAC) system designers to identify better CRAC configurations.
 									</p>
 									
-									<h3>Background</h3>
+									<h3>Theories</h3>
+										<p>
+											Computational Fluid Dynamics is using computing machinery to solve/simulate physical phenomena with fundamental theory in the field of fluid dynamic/mechanics. With the governing equations of fluid mechanics: Navier-Stokes (N-S) equations, one can simulate the flow patterns in a fluid space.
+											With finite difference method, a quadrilateral mesh grid can be created. However, there are many other topological meshes, which can be categorized as structured mesh and unstructured mesh. Instead of finite difference method, finite difference volume is a dominant discretized method used in CFD package since unstructured mesh can be easily implemented with it.
+											In addition, numerical flow simulation is a dominant method to solve the unsteady incompressible N-S equations. With this method, the continuous do- main is discretized and apply the discretized domain to the continuous N-S equations, namely a finite-dimensional problem. The simplest discretization of N-S equations is to use finite difference method to update the values of each cell until it converged. For specific fluid problem, a cell of a staggered 2D grid is shown in figure 1. Besides, the overall discretized domain is shown in figure 2.
+										</p>
+									<h3>Problem & Opportunity</h3>
+										<p>
+											Since the finer mesh will increase the accuracy of CFD simulation, scientists ex- pect to reduce the mesh size. However, the computational cost will increase dra- matically as the mesh gets finer. Therefore, parallel computing becomes useful in CFD simulation. In addition, due to complex geometry and boundary condi- tions of data center air-conditioning system, it is usually a time-consuming task to simulate the airflow patterns inside the data center. Hence, our problem is to parallelize the serial version of simulating airflow patterns of the air-conditioning system in a data center. physical model and boundary conditions (data-center; lid-driven cavity) The geometry is shown in figure 3 and the velocity boundary conditions are shown in table 1. Since the data center contains many racks, we just investigate the airflow patterns around one rack. In addition, since the geometry is symmetric, only half of the domain is calculated.
+											In order to simplify the geometry, the lid-driven cavity model (without ob- stacle) was firstly developed to ensure the correctness after parallelization. The physical model and the initial conditions of lid-driven cavity is shown in figure 4.
+										</p>
+									<h3>Our Approach</h3>
+										<p>
+											We parallelize the 2D simulation of Data Center Air Conditioning System using Cuda and MPI. The parallel speedup is to be measured with the baseline of serial version in C. In addition, the correctness is to be guaranteed with the Matlab version, which has already been verified with commercial software of Ansys Workbench. The visualization result is shown in figure 5. More details about our implementation is discussed later.
+										</p>
+								<h2 align="center">Details on Design & Implementation</h2>
+									<h3>Message Passing</h3>
 									<p>
-										Data centers nowadays require cooling all year round due to high power density of each rack as well as large quantity of servers. To reduce energy consumption and save costs, many effective computer room air conditioning (CRAC) systems are designed for optimizing the cooling performance as well as the amount of energy savings.
-									</p>
-									<p>
-										In order to detect the potential problem due to bad air flow design, computational fluid dynamic (CFD) simulation is necessary. Our 2D Navier-Stokes solver is aimed to predict the interior air flow patterns and temperature distribution with different inlet velocities and validate the results with Ansys. The simulation results can be used to help CRAC system designers to identify better CRAC configurations.
+										For message passing algorithms, we followed the approach to divide the underlying domain Ω into subdomains Ω1,Ω2,Ω3,...ΩN and have each processor treat one subdomain. This first domain decomposition method was proposed by Her- rmann Amandus Schwarz. In our solver, we used overlapping subdomains, as shown in figure 7. In each time-stepping loop, each subdomain is assigned to a processor and communicate with its neighbor processors or master processors when necessary.
 									</p>
 									
-									<h4>Simulation Algorithm</h4>
+								<h3>Cuda Based method</h3>
 									<p>
-										The simulation begins with geometry, boundary type and simulation control parameter input. To avoid serious oscillations of pressure value, a staggered grid mesh is then generated . The main time-stepping simulation loop starts after initialization. An adaptive time step is calculated for stability purpose. Boundary values of the matrices of x-velocity (U), y-velocity (V) is updated at each time step n. Then the values of temperature (T) at each cell in fluid domain at (n+1) time step is solved. With that, a linear system of pressure values (P) is solved with Poisson solver with successive over-relaxation (SOR). With pressure values (P) at (n+1) time step, x-velocity (U) and y-velocity at (n+1) time step can be solved. Simulation time and step are updated after each main iteration. The whole simulation terminates when simulation time is greater or equals to desired end time. The algorithm is shown in the flowchart.
+										The cuda based parallellization is implemented such that all the matrix related computation is done in the GPU memory. For all the for loop that is to update the matrix or matrix rows/columns, it can be computed in parallel in cuda threads without ordering restrictions. One exception is the Red-Black Gauss- Seidel parallellization step that is to be discussed more in detailed later. There are some other parts of the code that requires serialized computation, one is a sum of all the elements of a matrix, another is taking the max value of a matrix. The final implementation used third part cuBlas and thrust libraries for this. Multiple implementations are tried for improving this part of the computation and it turns out to be a significant part of cost of the whole simulation.
+										We also use one optimization to improve cache performance. We write new values to one copy of the matrix in memory while reading from another stale copy of the matrix in memory. At the end of each iteration or where we need the new matrix, we swap the pointers to the two matrix.
+										The Red-Black Gauss-Seidel parallellization is based on the idea that the update of a cell u[i][j] is based on the value of u[i-1][j], u[i+1][j], u[i][j-1], u[i][j+1]. From the graph below, we can find that for all the cells u[i][j], if i+j is odd, it only depends on the even indices. If i+j is even, it only depends on the odd indices. This makes it possible to update half of the matrix in parallel without ordering restrictions but still keeping the correctness.
+										With Red-Black Gauss-Seidel parallellization, the most repeated computation part of the simulation can be significantly speeded up.
+										For the max value of a given matrix, we tried using thrust max element function in the extrema utilities. We also tried cublas’s cublasIdamax function. We also implemented our own reduce based max element function. For the sum of a matrix, it is very similar to the max value function, we also used thrust reduce based implementation, cuBlas vector multiplication by creating a vector of all ones, and our own naive reduce based sum function.
+										Other parts of the code can be executed in parallel without other special interference or change of logic.
 									</p>
-									<span><img src="images/flowchart.png" alt="" /></span>
-									<h4>Geometry Description</h4>
+								<h2 align="center">Experiments</h2>
+								<h3>Environment Setup</h3>
 									<p>
-										The physical model is shown in figure below. Since the data center contains many rack servers, we just simplify to investigate the airflow patterns as well as temperature distribution surrounding one server, which is defined as one space cell. In addition, since the space cell is created as symmetric geometry, the calculation is conducted in half of the whole space cell.
+										Our C/C++ code should be able to run with different machines specs that has Nvidia GPU and cuda libraries installed or has MPI libraries installed. We cre- ated Makefiles that shoule be straight forward to run to generate the simulation results. No other special setup is required to run our code. However, CFD simulation is computationally heavy and will benefit from good performance multi-core GPU/CPU hardware.
+										To measure the performance, we performed most of the tests and experiments on the latedays cluster. We also used a AWS g2.2xlarge with GPU instance to run our experiments.
+										For more details, please refer to readme file in the source code.
+										If running on CMU machines, PATH needs to be modified according to http://15418.courses.cs.cmu.edu/fall2016/article/4.
 									</p>
-									<span><img src="images/geometry.png" alt="" /></span>
-
-									<h4>Inputs and Output</h4>
-									<p>
-										The detailed initialization parameters are shown in the table below. The outputs are the airflow velocity and temperature of each cell at the end time. In the end, a velocity plot of airflow distribution and temperature contour can be plotted. 
-									</p>
-									<h4>Benefits of parallelization</h4>
-									<p>
-										Since the problem is to solve the u (horizontal velocity), v (vertical velocity) and pressure of each cell within the domain of each time step, it will consume a huge amount of time if the mesh is fine enough so as to get convincing results. Parallelization of CFD problem could bring about significantly great speed up and still make sure the results are acceptable. An approach to parallelizing numerical algorithms for solving partial differential equations is to divide the underlying domain  into subdomains, and have each process treat one subdomain. By using MPI model to communicate, adjacent subdomains are able to exchange the necessary data. 
-									</p>
-
-									<h3>Challenges</h3>
-									<p>
-										The workload is highly computation bounded because we do not have too a large a model in terms of memory size but we need to do a large amount of computation and many iteraions before convergence for generation of each frame. I am not clear at present if divergent execution occurs much in our algorithm and whether we can apply vector intrinsics. That is definitely an option that we will consider because it will speedup the algorithm significantly if effectively used.
-									</p>
-									<p>
-										The geometry model contains different types for different grid points and the computation is not even for different types of grid. So scheduling will be challenge for us to distribute the work evenly on workers.
-									</p>
-									<p>
-										Also, the algorithm contains multiple phases that can be parallelized and each may have different characteristics. We need to explore various ways learned in class and find out the best way for particular scenarios, for example, use shared memory vs message passing. So this can be a general test of our understanding of various ideas in parallel computing without us being told which library or way we should apply.
-									</p>
-
-									<h3>Resources/Platform Choice</h3>
-									<p>
-										Our code should be able to run with different machines specs. To measure the performance, we plan to use Xeon Phi in Latedays cluster. We are starting from scratch by implementing a serial version of 2D solver of Data Center Air-conditioning system in C, but we do have a reference Matlab code implemented by Siliang in her other course perivously. Our algorithm will follow the pseudocode from the book Numerical Simulation. We plan to use MPI model to parallel the code, but we may also explore other possiblities for further speedup given time.
-									</p>
-
-									<h3>Goals and Deliverables</h3>
-									<p>
-										Our goal is to successfully complete a parallel version of the algorithm and study the airflow patterns and temperature distribution inside the data center with different supply velocity and direction so as to get a desirable Computer Room Air Conditioning System (CRAC) pre-design. We are going to benchmark performances of CRAC system with different initial inputs under different time steps before steady state. Moreover, we are going to compare our serial results, parallel results and results from commercial CFD software called ANSYS with the same inputs so as to evaluate the accuracy and performance of our programs.
-									</p>
-									<p>
-										In the best case, we should be able to achieve faster performance than the commercial software. The reason for believing in the best case performance is that our implementation will be more specific to the CRAC problem and will benefit from many special optimizations to this specific problem, so we may be able to outperform the commercial software designed for general simulations.
-									</p>
-									<p>
-										If we encounter unexpected difficulties, we should be able to at least have a faster parallel code than our own serial implementation. (for example if our serial code itself is slow or uses a different algorithm than the reference commercial software, then we may not be able to be faster than the commercial software with same input.)
-									</p>
-									<p>
-										Extra goals: Since the current geometry is 2D grid with quadrilateral mesh, we could try to make our model more complex by creating 3D meshing as well as apply more general dynamic scheduling instead of some static case specific code.
-									</p>
-									<p>
-										At the demo, we plan to show the simulation result generated ahead of time. If our code is fast enough, we will let user modifies a small input model and generate result and animation during the demo. We will also show our speedup vs our serial code as well as vs commercial software with different configurations in graphs. According to book Numerical Simulation which describes the speedup for a similar algorithm, a speedup similar to or better than the table below can be considered a good job.
-									</p>
-
-									<h3>Platform Choice</h3>
-									<p>
-										We will use Xeon Phi because our algorithm is computationally heavy and will benefit from high multi-core CPU performance. We will implement our algorithm in C for better performance and access to libraries like open MPI.
-									</p>
-
-									<h3>Schedule</h3>
-									<p>
-										10/31-11/06: Be familiar with algorithm, design the data structure and interfaces for the implementation of serial algorithm. Keep the design suitable for parallelization later. <br>
-										11/07-11/13: Complete the serial algorithm.<br>
-										11/14-11/20: Test and verify the correctness of the serial algorithm and start a simple parallel algorithm, complete checkpoint report.<br>
-										11/21-11/27: Explore one or ways of parallelization and have some milestone speedup results and tagged code version.<br>
-										11/28-12/4: Continue to improve the speedup and achieve the best speedup as we can.<br>
-										11/5-12/11: Run multiple benchmarks and compare with serial and commercial software performance. Complete demo, poster and report.<br>
-									</p>
-
-									<h3> Milestone Status(By 11/21)</h3>
-									<p>We have completed the serial version of the CFD simulation and investigated in two possible ways to parallel the implementation, one is using cuda and another is with MPI model. </p>
-									<p>We tested the correctness of our implementation and compared with matlab implementation. </p>
-									<p>We are behind our schedule by about one week and we think it is still possible to complete the main goal of our project, which is to achieve a non-trivial speedup for the CFD simulation. But in terms of achieving a parallel speedup that can complete a demo time simulation and rendering, we are concerned that the problem scale might be too large or our speedup will not be good enough. So we may only be able to run multiple simulations before the demo and show speedup graphs of the approaches we implemented and some analysis as well as some animations.</p>
-									<p>Revised Deliverables: </p>
-									<p>speedup graph of two or possibly more parallel approaches</p>
-									<p>analysis of the parallel approaches with speedup benefits and bottlenecks</p>
-									<p>comparison of speedup with commercial software</p>
-									<p>simulation results rendering animations</p>
+								<h3>Experimental Evaluation</h3>
+								<span class="image featured"><img src="images/speedup.png" alt="" /></span>
+								</article>
+								<p>
+									As shown in the graph(Speedup graph for MPI based implementation), we’ve achieved group speedup with the MPI implementation that scales with the number of cores. 
+								</p>
+								<h2 align="center">Conclusions</h2>
+								<p>
+									We have demonstrated both our parallellized approach can generate the correct simulation results. The MPI based approach outperforms the serial code as the number of cores grow. It works well on a single node with multiple cores.
+								</p>
+								<h2 align="center">Appendix</h2>
+								<h3>MPI Pseudo Code</h3>
+								<span class="image featured"><img src="images/code.png" alt="" /></span>
 								</article>
 
 						</div>
 					</div>
 				</div>
-
-			<!-- Footer -->
-				<!-- <div id="footer-wrapper">
-					<div id="footer" class="container">
-						<header>
-							<h2>Questions or comments? <strong>Get in touch:</strong></h2>
-						</header>
-						<div class="row">
-							<div class="6u 12u(mobile)">
-								<section>
-									<form method="post" action="#">
-										<div class="row 50%">
-											<div class="6u 12u(mobile)">
-												<input name="name" placeholder="Name" type="text" />
-											</div>
-											<div class="6u 12u(mobile)">
-												<input name="email" placeholder="Email" type="text" />
-											</div>
-										</div>
-										<div class="row 50%">
-											<div class="12u">
-												<textarea name="message" placeholder="Message"></textarea>
-											</div>
-										</div>
-										<div class="row 50%">
-											<div class="12u">
-												<a href="#" class="form-button-submit button icon fa-envelope">Send Message</a>
-											</div>
-										</div>
-									</form>
-								</section>
-							</div>
-							<div class="6u 12u(mobile)">
-								<section>
-									<p>Erat lorem ipsum veroeros consequat magna tempus lorem ipsum consequat Phaselamet
-									mollis tortor congue. Sed quis mauris sit amet magna accumsan tristique. Curabitur
-									leo nibh, rutrum eu malesuada.</p>
-									<div class="row">
-										<div class="6u 12u(mobile)">
-											<ul class="icons">
-												<li class="icon fa-home">
-													1234 Somewhere Road<br />
-													Nashville, TN 00000<br />
-													USA
-												</li>
-												<li class="icon fa-phone">
-													(000) 000-0000
-												</li>
-												<li class="icon fa-envelope">
-													<a href="#">info@untitled.tld</a>
-												</li>
-											</ul>
-										</div>
-										<div class="6u 12u(mobile)">
-											<ul class="icons">
-												<li class="icon fa-twitter">
-													<a href="#">@untitled-tld</a>
-												</li>
-												<li class="icon fa-instagram">
-													<a href="#">instagram.com/untitled-tld</a>
-												</li>
-												<li class="icon fa-dribbble">
-													<a href="#">dribbble.com/untitled-tld</a>
-												</li>
-												<li class="icon fa-facebook">
-													<a href="#">facebook.com/untitled-tld</a>
-												</li>
-											</ul>
-										</div>
-									</div>
-								</section>
-							</div>
-						</div>
-					</div>
-					<div id="copyright" class="container">
-						<ul class="links">
-							<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-						</ul>
-					</div>
-				</div> -->
 
 		</div>
 
